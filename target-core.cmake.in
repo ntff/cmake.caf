@@ -1,0 +1,30 @@
+cmake_minimum_required(VERSION 3.4)
+
+if(NOT TARGET @PROJECT_NAME@::core)
+
+    add_library(@PROJECT_NAME@::core STATIC IMPORTED)
+
+    set_property(TARGET @PROJECT_NAME@::core
+        APPEND PROPERTY IMPORTED_LINK_LIBRARIES @PROJECT_NAME@)
+
+#    set_property(TARGET @PROJECT_NAME@::core
+#        APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES
+#            "${@PROJECT_NAME@_DIR}/include")
+
+    set_property(TARGET @PROJECT_NAME@::core
+        APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
+    set_property(TARGET @PROJECT_NAME@::core
+        APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
+
+    set_target_properties(@PROJECT_NAME@::core PROPERTIES
+        MAP_IMPORTED_CONFIG                "Debug"
+        MAP_IMPORTED_CONFIG_RELWITHDEBINFO "Release"
+        IMPORTED_LINK_INTERFACE_LANGUAGES_DEBUG   "CXX"
+        IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "CXX"
+        IMPORTED_LOCATION_DEBUG
+            "${@PROJECT_NAME@_DIR}/lib/lib@PROJECT_NAME_LOWER@_core-d.a"
+        IMPORTED_LOCATION_RELEASE
+            "${@PROJECT_NAME@_DIR}/lib/lib@PROJECT_NAME_LOWER@_core.a"
+    )
+
+endif()

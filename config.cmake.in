@@ -1,0 +1,36 @@
+cmake_minimum_required(VERSION 3.4)
+
+get_filename_component(@PROJECT_NAME@_DIR
+    "${CMAKE_CURRENT_LIST_DIR}/" ABSOLUTE)
+
+if(NOT TARGET @PROJECT_NAME@)
+    add_library(@PROJECT_NAME@ INTERFACE IMPORTED)
+    set_target_properties(@PROJECT_NAME@ PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${@PROJECT_NAME@_DIR}/include"
+    )
+endif()
+
+if(NOT @PROJECT_NAME@_FIND_COMPONENTS)
+    file(GLOB _ALL_COMPONENT_FILES
+        LIST_DIRECTORIES false
+        ${PACKAGE_PREFIX_DIR}/@PROJECT_NAME_LOWER@-target-*.cmake
+    )
+    foreach(_FILE ${_ALL_COMPONENT_FILES})
+        include(${_FILE})
+    endforeach()
+else()
+    foreach(_COMPONENT ${@PROJECT_NAME@_FIND_COMPONENTS})
+        string(TOLOWER "${_COMPONENT}" _COMPONENT_LOWER)
+        set(_COMPONENT_FILE
+            "${PACKAGE_PREFIX_DIR}/@PROJECT_NAME_LOWER@-target-${_COMPONENT_LOWER}.cmake")
+        if(EXISTS ${_COMPONENT_FILE})
+            include(${_COMPONENT_FILE})
+        else()
+            set(@PROJECT_NAME@_@_COMPONENT@_FOUND False)
+            set(@PROJECT_NAME@_@_COMPONENT@_NOTFOUND_MESSAGE
+                "Unsupported component: ${_COMPONENT}")
+        endif()
+    endforeach()
+endif()
+
+set(@PROJECT_NAME@_FOUND TRUE)
